@@ -2,9 +2,19 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 # Use psycopg2 driver to avoid requiring the separate psycopg package.
-DATABASE_URL = "postgresql+psycopg2://postgres:1234@localhost:5432/ajou_se_db"
+# The 'options' query parameter sets lc_messages=C so that PostgreSQL
+# returns error messages in English (ASCII), preventing UnicodeDecodeError
+# when the server locale is Korean (CP949) and psycopg2 tries to decode
+# the message with Python's default UTF-8 codec.
+DATABASE_URL = (
+    "postgresql+psycopg2://postgres:1234@localhost:5432/ajou_se_db"
+    "?options=-c%20lc_messages%3DC"
+)
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"client_encoding": "utf8"},
+)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

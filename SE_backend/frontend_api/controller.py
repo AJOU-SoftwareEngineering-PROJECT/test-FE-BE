@@ -1378,4 +1378,7 @@ def get_dashboard(db: Session = Depends(get_db)):
     }
 
 
-create_frontend_tables()
+# Tables are created at application startup via main.py / lifespan hook.
+# Do NOT call create_frontend_tables() here to avoid unintended DB connections
+# when this module is imported by scripts (e.g. seed_test_data.py).
+# create_frontend_tables()  ← intentionally commented out
